@@ -14,7 +14,10 @@ products = [
 
 @app.route('/')
 def catalog():
-    return render_template('catalog.html', products=products)
+    cart = get_cart()
+    cart_item_count = sum(item['quantity'] for item in cart)
+    return render_template('catalog.html', products=products, cart_item_count=cart_item_count)
+
 def get_cart():
     if 'cart' not in session:
         session['cart'] = []
@@ -44,4 +47,8 @@ def add_to_cart():
 def view_cart():
     cart = get_cart()
     total = sum(item['price'] * item['quantity'] for item in cart)
-    return render_template('cart.html', cart=cart, total=total)
+    cart_item_count = sum(item['quantity'] for item in cart)
+    return render_template('cart.html', cart=cart, total=total, cart_item_count=cart_item_count)
+
+if __name__ == '__main__':
+    app.run(debug=True)

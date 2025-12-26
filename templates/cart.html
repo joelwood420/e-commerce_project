@@ -28,15 +28,15 @@
             <tbody>
                 {% for item in cart %}
                   <tr>
-                      <td>{{ item.product.name }}</td>
-                      <td>${{ '%.2f'|format(item.product.price) }}</td>
+                      <td>{{ item.name }}</td>
+                      <td>${{ '%.2f'|format(item.price) }}</td>
                       <td>{{ item.quantity }}</td>
-                      <td>${{ '%.2f'|format(item.product.price * item.quantity) }}</td>
+                      <td>${{ '%.2f'|format(item.price * item.quantity) }}</td>
                   </tr>
                 {% endfor %}
             </tbody>
           </table>
-            <h3>Total Amount: ${{ '%.2f'|format(total_amount) }}</h3>
+            <h3>Total Amount: ${{ '%.2f'|format(total) }}</h3>
          {% else %}
             <p>Your cart is empty.</p>
          {% endif %}
