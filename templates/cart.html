@@ -23,6 +23,7 @@
                     <th>Price</th>
                     <th>Quantity</th>
                     <th>Total</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +33,12 @@
                       <td>${{ '%.2f'|format(item.price) }}</td>
                       <td>{{ item.quantity }}</td>
                       <td>${{ '%.2f'|format(item.price * item.quantity) }}</td>
+                      <td>
+                          <form action="/remove_from_cart" method="post">
+                              <input type="hidden" name="product_id" value="{{ item.id }}">
+                              <button type="submit">Remove</button>
+                          </form>
+                      </td>
                   </tr>
                 {% endfor %}
             </tbody>

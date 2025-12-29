@@ -1,15 +1,13 @@
+from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, session
 
 app = Flask(__name__)
 app.secret_key = '1995'
 
 
-products = [
-    {'id': 1, 'name': 'Laptop', 'price': 999.99},
-    {'id': 2, 'name': 'Smartphone', 'price': 499.99},
-    {'id': 3, 'name': 'Tablet', 'price': 299.99},
-    {'id': 4, 'name': 'Headphones', 'price': 199.99}
-]
+db = SQL("sqlite:///database/ecommerce.db")
+
+products = db.execute("SELECT id, product_name as name, price, image_url FROM products")
 
 
 @app.route('/')
@@ -41,6 +39,16 @@ def add_to_cart():
 
     session.modified = True
     return redirect(url_for('catalog'))
+
+@app.route('/remove_from_cart', methods=['POST'])
+def remove_from_cart():
+    cart = get_cart()
+    product_id = int(request.form['product_id'])
+
+    cart = [item for item in cart if item['id'] != product_id]
+    session['cart'] = cart
+    session.modified = True
+    return redirect(url_for('view_cart'))
 
 
 @app.route('/cart')
