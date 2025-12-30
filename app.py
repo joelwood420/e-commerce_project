@@ -58,5 +58,20 @@ def view_cart():
     cart_item_count = sum(item['quantity'] for item in cart)
     return render_template('cart.html', cart=cart, total=total, cart_item_count=cart_item_count)
 
+@app.route('/admin', methods=['GET'])
+def admin_dashboard():
+    return render_template('admin_login.html')
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    username = request.form['username']
+    password = request.form['password']
+
+    if username == 'admin' and password == 'password':
+        session['admin_logged_in'] = True
+        return redirect(url_for('admin_dashboard'))
+    else:
+        return render_template('admin_login.html', error='Invalid credentials')
+
 if __name__ == '__main__':
     app.run(debug=True)
