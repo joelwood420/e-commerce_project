@@ -59,7 +59,7 @@ def view_cart():
     return render_template('cart.html', cart=cart, total=total, cart_item_count=cart_item_count)
 
 @app.route('/admin', methods=['GET'])
-def admin_dashboard():
+def admin_login_page():
     return render_template('admin_login.html')
 
 @app.route('/admin/login', methods=['POST'])
@@ -72,6 +72,12 @@ def admin_login():
         return redirect(url_for('admin_dashboard'))
     else:
         return render_template('admin_login.html', error='Invalid credentials')
+
+@app.route('/admin/dashboard', methods=['GET'])
+def admin_dashboard():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login_page'))
+    return render_template('admin_dashboard.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
