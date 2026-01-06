@@ -58,25 +58,41 @@ def view_cart():
     cart_item_count = sum(item['quantity'] for item in cart)
     return render_template('cart.html', cart=cart, total=total, cart_item_count=cart_item_count)
 
-@app.route('/admin', methods=['GET'])
+@app.route('/customer_details', methods=['GET', 'POST'])
+def customer_details():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        address = request.form['address']
+
+        db.execute("INSERT INTO customer_details (name, email, address) VALUES (?, ?, ?)", name, email, address)
+
+        return redirect(url_for('order_confirmation'))
+
+    return render_template('customer_details_form.html')
+
+@app.route('/admin', methods=['POST', 'GET'])
 def admin_login_page():
     return render_template('admin_login.html')
+
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
     username = request.form['username']
     password = request.form['password']
 
-    if username == 'admin' and password == 'password':
+    user = db.execute("SELECT username, password FROM admin_users WHERE username = ? AND password = ?", username, password)
+
+    if user:
         session['admin_logged_in'] = True
         return redirect(url_for('admin_dashboard'))
     else:
-        return render_template('admin_login.html', error='Invalid credentials')
+        return render_template('admin_login.html', error ='Invalid username or password')
 
 @app.route('/admin/dashboard', methods=['GET'])
 def admin_dashboard():
     if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_login_page'))
+        return render_template('admin_login.html', error ='Please log in to access the dashboard')
     return render_template('admin_dashboard.html')
 
 if __name__ == '__main__':
