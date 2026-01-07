@@ -1,5 +1,7 @@
 from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, session
+import random
+import string
 
 app = Flask(__name__)
 app.secret_key = '1995'
@@ -58,18 +60,53 @@ def view_cart():
     cart_item_count = sum(item['quantity'] for item in cart)
     return render_template('cart.html', cart=cart, total=total, cart_item_count=cart_item_count)
 
+
+def generate_order_number():
+    random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return f"ORD-{random_part}"
+
 @app.route('/customer_details', methods=['GET', 'POST'])
 def customer_details():
     if request.method == 'POST':
-        name = request.form['name']
+        firstname = request.form['firstname']
+        lastname = request.form['lastname']
         email = request.form['email']
-        address = request.form['address']
+        phone = request.form['phone']
+        streetnumber = request.form['streetnumber']
+        streetname = request.form['streetname']
+        city = request.form['city']
+        state = request.form['state']
+        zip_code = request.form['zip_code']
 
-        db.execute("INSERT INTO customer_details (name, email, address) VALUES (?, ?, ?)", name, email, address)
+        db.execute("INSERT INTO customer_details (firstname, lastname, email, phone, streetnumber, streetname, city, state, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", firstname, lastname, email, phone, streetnumber, streetname, city, state, zip_code)
+
+        customer_id = db.execute("SELECT last_insert_rowid() AS id")[0]['id']
+
+        cart = get_cart()
+        total = sum(item['price'] * item['quantity'] for item in cart)
+
+        order_number = generate_order_number()
+
+        db.execute("INSERT INTO orders (customer_id, order_number, total_amount) VALUES (?, ?, ?)", customer_id, order_number, total)
+
+        order_id = db.execute("SELECT last_insert_rowid() AS id")[0]['id']
+
+        for item in cart:
+            db.execute("INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES (?, ?, ?, ?, ?)", 
+                       order_id, item['id'], item['name'], item['quantity'], item['price'])
+
+        session['cart'] = []
+        session.modified = True 
+
+        session['last_order_number'] = order_number
 
         return redirect(url_for('order_confirmation'))
 
-    return render_template('customer_details_form.html')
+    return render_template('shipping_details.html')
+
+@app.route('/order_confirmation')
+def order_confirmation():
+    return render_template('order_confirmation.html')
 
 @app.route('/admin', methods=['POST', 'GET'])
 def admin_login_page():
