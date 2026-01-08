@@ -170,23 +170,23 @@ def order_details():
     order_id = request.args.get('order_id')
     order = db.execute("""
        SELECT 
-           o.id,
-           o.order_number,
-           o.total_amount,
-           o.order_date,
-           c.firstname,
-           c.lastname,
-           c.email,
-           c.phone,
-           c.streetnumber,
-           c.streetname,
-           c.city,
-           c.state,
-           c.zip_code,
-           c.firstname || ' ' || c.lastname AS customer_name
-       FROM orders o
-       JOIN customer_details c ON o.customer_id = c.id
-       WHERE o.id = ?
+           orders.id,
+           orders.order_number,
+           orders.total_amount,
+           orders.order_date,
+           customer_details.firstname,
+           customer_details.lastname,
+           customer_details.email,
+           customer_details.phone,
+           customer_details.streetnumber,
+           customer_details.streetname,
+           customer_details.city,
+           customer_details.state,
+           customer_details.zip_code,
+           customer_details.firstname || ' ' || customer_details.lastname AS customer_name
+       FROM orders
+       JOIN customer_details ON orders.customer_id = customer_details.id
+       WHERE orders.id = ?
    """, order_id)
     
     if not order:
