@@ -106,7 +106,8 @@ def customer_details():
 
 @app.route('/order_confirmation')
 def order_confirmation():
-    return render_template('order_confirmation.html')
+    order_number = session.get('last_order_number')
+    return render_template('order_confirmation.html', order_number=order_number)
 
 @app.route('/admin', methods=['POST', 'GET'])
 def admin_login_page():

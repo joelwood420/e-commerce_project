@@ -5,14 +5,14 @@
 {% block content %}
 <div class="container px-4 px-lg-5 my-5">
     <h1 class="display-5 fw-bolder mb-4">Shipping Details</h1>
-    <form action="/submit_shipping_details" method="post">
+    <form action="/customer_details.qui" method="post">
         <div class="mb-3">
-            <label for="first_name" class="form-label">First Name</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
+            <label for="firstname" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" required>
         </div>
         <div class="mb-3">
-            <label for="last_name" class="form-label">Last Name</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
+            <label for="lastname" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" required>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
@@ -42,7 +42,8 @@
             <label for="zip_code" class="form-label">Zip Code</label>
             <input type="text" class="form-control" id="zip_code" name="zip_code" required>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Complete Order</button>
+        <a href="/cart" class="btn btn-outline-secondary ms-2">Back to Cart</a>
     </form>
 </div>
 {% endblock %}
