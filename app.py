@@ -133,5 +133,77 @@ def admin_dashboard():
         return render_template('admin_login.html', error ='Please log in to access the dashboard')
     return render_template('admin_dashboard.html')
 
+
+@app.route('/admin/orders')
+def view_orders():
+    if not session.get('admin_logged_in'):
+        return render_template('admin_login.html', error='Please log in to access the dashboard')
+
+    orders = db.execute("""         
+        SELECT 
+            o.id,
+            o.order_number,
+            o.total_amount,
+            o.order_date,
+            c.firstname,
+            c.lastname,
+            c.email,
+            c.phone,
+            c.streetnumber,
+            c.streetname,
+            c.city,
+            c.state,
+            c.zip_code,
+            c.firstname || ' ' || c.lastname AS customer_name
+        FROM orders o
+        JOIN customer_details c ON o.customer_id = c.id
+        ORDER BY o.order_date DESC
+    """)
+    
+    return render_template('admin_orders.html', orders=orders)
+
+@app.route('/admin/orders/details')
+def order_details():
+    if not session.get('admin_logged_in'):
+        return render_template('admin_login.html', error='Please log in to access the dashboard')
+
+    order_id = request.args.get('order_id')
+    order = db.execute("""
+       SELECT 
+           o.id,
+           o.order_number,
+           o.total_amount,
+           o.order_date,
+           c.firstname,
+           c.lastname,
+           c.email,
+           c.phone,
+           c.streetnumber,
+           c.streetname,
+           c.city,
+           c.state,
+           c.zip_code,
+           c.firstname || ' ' || c.lastname AS customer_name
+       FROM orders o
+       JOIN customer_details c ON o.customer_id = c.id
+       WHERE o.id = ?
+   """, order_id)
+    
+    if not order:
+        return redirect(url_for('view_orders'))
+    
+    order = order[0]
+
+    order_items = db.execute("""
+        SELECT 
+            product_name,
+            quantity,
+            price
+        FROM order_items
+        WHERE order_id = ?
+    """, order_id)
+
+    return render_template('admin_order_details.html', order=order, order_items=order_items)
+
 if __name__ == '__main__':
     app.run(debug=True)
